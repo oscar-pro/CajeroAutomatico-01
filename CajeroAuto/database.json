@@ -1,0 +1,9 @@
+{
+    "User": 
+        {
+            "name": "John Doe",
+            "balance": 100000,
+            "clave": 3245
+        }
+    
+}
