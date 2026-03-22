@@ -1,4 +1,3 @@
-
 let ConsultarSaldo = document.getElementById("btn-consultar-saldo");
 let RetirarDinero = document.getElementById("btn-retirar-dinero");
 let DepositarDinero = document.getElementById("btn-depositar-dinero");
@@ -74,20 +73,6 @@ if (pagina.includes("Saldo.html")) {
 }
 
 
-/*---------------------------------------------------------------
-    Pagina de validación
-    ----------------------------------------------------------------*/
-
-if (pagina.includes("Validacion.html")) {
-    console.log(`La pagina actual es ${pagina}`);
-
-    Salir.addEventListener('click', () => {
-        let confirm = window.confirm('Seguro Que Deseas Salir?');
-        if (confirm) {
-            window.close();
-        };
-    });
-}
 
 /*---------------------------------------------------------------
     Pagina de Deposito
@@ -116,130 +101,161 @@ if (pagina.includes("Retiroh.html")) {
     });
 }
 
-/* --------------------------------------------
-    Pagina de validacion de datos 
---------------------------------------------- */
-
-// capturamos botones O y O 
+/*---------------------------------------------------------------
+    Pagina de validación
+    ----------------------------------------------------------------*/
 
 const X = document.getElementById('btnBorrar');
 const O = document.getElementById('btnSeguir');
 
 
+if (pagina.includes("Validacion.html")) {
+    console.log(`La pagina actual es ${pagina}`);
 
-let User = document.getElementById('User');
-let PassWord = document.getElementById('Mostrar');
+    Salir.addEventListener('click', () => {
+        let confirm = window.confirm('Seguro Que Deseas Salir?');
+        if (confirm) {
+            window.close();
+        };
+    });
+
+
+    /* --------------------------------------------
+        Pagina de validacion de datos del usuario
+    --------------------------------------------- */
+
+
+    const X = document.getElementById('btnBorrar');
+    const O = document.getElementById('btnSeguir');
 
 
 
+    let User = document.getElementById('User');
 
-/* --------------------------------------------
- Funcion para eliminar contenido Con X 
- --------------------------------------------*/
 
-X.addEventListener('click', () => {
-    if (User.value.length > 0 && PassWord.value.length > 0) {
-        User.value = '';
-        PassWord.value = '';
-        PassWord.disabled = true;
-        User.disabled = false;
-    } else {
-        if (User.value.length > 0) {
+    /* --------------------------------------------
+     Funcion para eliminar contenido Con X 
+     --------------------------------------------*/
+    X.addEventListener('click', () => {
+        if (User.value) {
             User.value = '';
-            PassWord.disabled = true;
-            O.disabled = false;
-
-        } else {
-            if (PassWord.value.length > 0) {
-                PassWord.value = '';
-                PassWord.disabled = true;
-
-            }
-        }
-    }
-});
-
-/*-----------------------------------------------------------
- ahora colocamos el valor del boton clickeado en el input
------------------------------------------------------------*/
-
-let btn1 = document.getElementById('btn1');
-let btn2 = document.getElementById('btn2');
-let btn3 = document.getElementById('btn3');
-let btn4 = document.getElementById('btn4');
-let btn5 = document.getElementById('btn5');
-let btn6 = document.getElementById('btn6');
-let btn7 = document.getElementById('btn7');
-let btn8 = document.getElementById('btn8');
-let btn9 = document.getElementById('btn9');
-let btn0 = document.getElementById('btn0');
-
-/*-----------------------------------------------------------
- guardamos todos los botones en un array  
- -----------------------------------------------------------*/
-let botones = [
-    btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9,
-];
-
-//deshabilitamos los botones hasta que pasemos a la siguiente casilla 
-botones.forEach(boton => {
-    boton.disabled = true;
-});
-
-
-//hacemos una funcion para cada elemento(boton) del array 
-
-botones.forEach(boton => {
-    boton.addEventListener('click', (e) => {
-        if (PassWord.value.length === 4) {
-            return;
-        } else {
-            PassWord.value += e.target.textContent;
         }
     });
-});
 
-
-//Primero deshabilitamos un input, debe completarse el user primero
-PassWord.disabled = true;
-PassWord.style.BackgroundColor = '#ccc';
-
-
-/*---------------------------------------------------------------------------
-    despues de comprobar que las casillas no estén vacias seguimos al pasword
----------------------------------------------------------------------------*/
-
-/* ------------------------------------------------------------------------
-    v = 0 , v = 1 User pased, v = 2 para validar password, codigo aún no está listo.
--------------------------------------------------------------------------- */
-
-let VCount = 0
-
-O.addEventListener('click', () => {
-    // verificamos si las casillas son diferentes a casillas vacias, seguimos
-    if (User.value != '') {
-        PassWord.disabled = false;
-        User.disabled = true;
-        VCount++;
-        //imprimimos por consola para comprobar que el valor cambie
-        console.log(VCount);
-        if(VCount == 1){
-            O.disabled = true;
-            if(PassWord.length == 3){
-                O.disabled = false;
-                O.addEventListener('click',()=>{
-                    VCount++;
-                });
-            }
-        }else{
-            
+    /* Function para validar los datos y enviarlos */
+    O.addEventListener('click', () => {
+        if (!User.value) {
+            alert('⚠Las casillas no pueden estar vacias');
+        } else {
+            let dataUser = User.value.toUpperCase();
+            JsonData(dataUser);
         }
-        botones.forEach(boton => {
-            boton.disabled = false;
-        });
-    } else {
-        alert('No se permiten casillas vacias');
-        return;
-    };
-});
+    })
+};
 
+/*-----------------------------------------------------------------
+función para la peticion con fetch a json y validar los datos
+-----------------------------------------------------------------*/
+
+async function JsonData(value) {
+    let esp = await fetch('../database.json');
+    if (esp.ok) {
+        let resp = await esp.json();
+        // pasamos nombre a mayuscula para que no halla error en comparar 
+        let NameJson = resp.User.name.toUpperCase();
+        /*--------------------------------
+                Eliminamos espacios 
+        ---------------------------------*/
+        NameJson = NameJson.trim();
+        value = value.trim();
+
+        // comparamos si existe dentro de json 
+        if (value != NameJson) {
+            alert('LOS DATOS NO COINCIDEN \n INTENTELO NUEVAMENTE');
+            // limpiamos las casilas luego de que pase 1.5 segundos 
+            setTimeout(() => {
+                User.value = '';
+            }, 1500);
+        } else {
+            // en caso que todo esté bien, nos vamos a validar la con password
+            window.location = 'PasswordVerifiqued.html';
+        }
+    }
+}
+
+/* --------------------------------------------
+    pagina para la validation de la contraseña 
+--------------------------------------------- */
+if (pagina.includes("PasswordVerifiqued.html")) {
+    console.log(`La pagina actual es ${pagina}`);
+    let password = document.getElementById('Mostrar');
+    Salir.addEventListener('click', () => {
+        let confirm = window.confirm('Seguro Que Deseas Salir?');
+        if (confirm) {
+            window.close();
+        };
+    });
+
+    /* --------------------------------------------
+ Funcion para eliminar contenido Con X 
+ --------------------------------------------*/
+    X.addEventListener('click', () => {
+        if (password.value) {
+            password.value = '';
+        }
+    });
+
+
+    /*Guardamos los botones de la funcion en un array para luego utilizarlos */
+    let b1 = document.getElementById('btn1');
+    let b2 = document.getElementById('btn2');
+    let b3 = document.getElementById('btn3');
+    let b4 = document.getElementById('btn4');
+    let b5 = document.getElementById('btn5');
+    let b6 = document.getElementById('btn6');
+    let b7 = document.getElementById('btn7');
+    let b8 = document.getElementById('btn8');
+    let b9 = document.getElementById('btn9');
+    let b0 = document.getElementById('btn0');
+
+    let Botones = [b1, b2, b3, b4, b5, b6, b7, b8, b9, b0];
+
+    /* ahora hacemos una funcion que los valores de los botones me los pase al input */
+    Botones.forEach(botones => {
+
+        botones.addEventListener('click', () => {
+            // Verificamos si el valor es igual o mayor que 4 
+            if (password.value.length === 4) {
+                return;
+            } else {
+                //enviamos para que los datos se coloquen por medio de una function
+                ColocarDatos(botones.textContent);
+            }
+
+        });
+
+    });
+    // funcion para que los datos de los btotones aparezcan dentro del input 
+
+    function ColocarDatos(valor) {
+        password.value += valor;
+    }
+
+    //ahora le añadimos interactividad al O
+
+    O.addEventListener('click', () => {
+        //comparamos con fetch
+        let value = password.value;
+        CompararContrasenia(value);
+    });
+    async function CompararContrasenia(value) {
+        const esp = await fetch(`http://localhost:3000/login?pin=${value}`, {
+            method: "GET"
+        }); 
+        if (esp.ok) {
+            let respuesta = esp;
+            console.log(esp);
+        }
+
+    }
+};
