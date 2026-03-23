@@ -4,13 +4,8 @@ let DepositarDinero = document.getElementById("btn-depositar-dinero");
 let Salir = document.getElementById("BtnSalir");
 // Primero lo facil, creare la funcion para salir de la pagina
 
-/*---------------------------------------------------------------------------------------------------------
-Capturamos la ruta en PAGINA para saber en cual pagina estamos actualmente y poder ejecutar el script 
-----------------------------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 const pagina = window.location.pathname;
-
-//guardamos la ruta la cual quiere ingresar el usuario
-let ruta = '';
 
 /*---------------------------------------------------------------
     pagina principal Cajero Automatico
@@ -18,9 +13,7 @@ let ruta = '';
 
 if (pagina.includes("CajeroAuto.html")) {
 
-    /*---------------------------------------------------------------
-     Mostrar en consola la ruta en la pagina actual
-     ----------------------------------------------------------------*/
+    /*---------------------------------------------------------------     ----------------------------------------------------------------*/
     console.log(`La pagina actual es ${pagina}`);
 
 
@@ -28,8 +21,8 @@ if (pagina.includes("CajeroAuto.html")) {
      Este script es escencial para todos los que tenga boton de salir 
     --------------------------------------------------------------------*/
     Salir.addEventListener('click', () => {
-        let confirm = window.confirm('Seguro Que Deseas Salir?');
-        if (confirm) {
+        let confirmar = window.confirm('Seguro Que Deseas Salir?');
+        if (confirmar) {
             window.close();
         };
     });
@@ -37,21 +30,26 @@ if (pagina.includes("CajeroAuto.html")) {
     // Primero va la validación de la cuenta para ingresar el user y despues ir a los enlaces
 
     ConsultarSaldo.addEventListener('click', () => {
-        ruta = localStorage.setItem('../CajeroAuto/Validación de cuenta/Validacion.html');
+        //Guardamos ruta 
+        localStorage.setItem('ruta', '../Validación de cuenta/Enlaces/Saldo.html');
         window.location = "../CajeroAuto/Validación de cuenta/Validacion.html";
 
         // window.location = "../CajeroAuto/Validación de cuenta/Enlaces/Saldo.html";
     });
 
     RetirarDinero.addEventListener('click', () => {
-        ruta = localStorage.setItem('../CajeroAuto/Validación de cuenta/Validacion.html');
+
+        //Guardamos ruta 
+        localStorage.setItem('ruta', '../Validación de cuenta/Enlaces/Retiro.html');
         window.location = "../CajeroAuto/Validación de cuenta/Validacion.html";
         // window.location = "../CajeroAuto/Validación de cuenta/Enlaces/Retiro.html";
 
     });
 
     DepositarDinero.addEventListener('click', () => {
-        ruta = localStorage.setItem('../CajeroAuto/Validación de cuenta/Validacion.html');
+
+        //Guardamos ruta 
+        localStorage.setItem('ruta', '../Validación de cuenta/Enlaces/Deposito.html');
         window.location = "../CajeroAuto/Validación de cuenta/Validacion.html";
         // window.location = "../CajeroAuto/Validación de cuenta/Enlaces/Deposito.html";
     })
@@ -64,15 +62,13 @@ if (pagina.includes("CajeroAuto.html")) {
 
 if (pagina.includes("Saldo.html")) {
 
-    /*---------------------------------------------------------------
-     Mostrar en consola la ruta en la pagina actual
-     ----------------------------------------------------------------*/
+    /*---------------------------------------------------------------     ----------------------------------------------------------------*/
     console.log(`La pagina actual es ${pagina}`);
 
     Salir.addEventListener('click', () => {
         let confirm = window.confirm('Seguro Que Deseas Salir?');
         if (confirm) {
-            window.close();
+            window.location = "../../CajeroAuto.html";
         };
     });
 }
@@ -88,20 +84,20 @@ if (pagina.includes("Deposito.html")) {
     Salir.addEventListener('click', () => {
         let confirm = window.confirm('Seguro Que Deseas Salir?');
         if (confirm) {
-            window.close();
+            window.location = "../../CajeroAuto.html";
         };
     });
 }
 /*---------------------------------------------------------------
     Pagina De Retiro
     ----------------------------------------------------------------*/
-if (pagina.includes("Retiroh.html")) {
+if (pagina.includes("Retiro.html")) {
     console.log(`La pagina actual es ${pagina}`);
 
     Salir.addEventListener('click', () => {
         let confirm = window.confirm('Seguro Que Deseas Salir?');
         if (confirm) {
-            window.close();
+            window.location = "../../CajeroAuto.html";
         };
     });
 }
@@ -120,7 +116,7 @@ if (pagina.includes("Validacion.html")) {
     Salir.addEventListener('click', () => {
         let confirm = window.confirm('Seguro Que Deseas Salir?');
         if (confirm) {
-            window.close();
+            window.location = "../CajeroAuto.html";
         };
     });
 
@@ -209,10 +205,11 @@ async function ValidarUsuario(nombre) {
 if (pagina.includes("PasswordVerifiqued.html")) {
     console.log(`La pagina actual es ${pagina}`);
     let password = document.getElementById('Mostrar');
+
     Salir.addEventListener('click', () => {
         let confirm = window.confirm('Seguro Que Deseas Salir?');
         if (confirm) {
-            window.close();
+            window.location = "../CajeroAuto.html";
         };
     });
 
@@ -271,8 +268,6 @@ if (pagina.includes("PasswordVerifiqued.html")) {
     async function CompararContrasenia(pin) {
 
         let nombre = localStorage.getItem("usuario");
-        let rua = localStorage.getItem(ruta);
-
         try {
 
             const resp = await fetch(
@@ -284,9 +279,9 @@ if (pagina.includes("PasswordVerifiqued.html")) {
             console.log(data);
 
             if (data.ok) {
-
+                const Ruta = localStorage.getItem("ruta");
                 console.log("PIN correcto");
-                window.location.href = rua;
+                window.location.href = Ruta;
 
             } else {
 
