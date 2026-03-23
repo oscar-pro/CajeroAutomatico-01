@@ -1,4 +1,3 @@
-
 const express = require("express");
 const sql = require("mssql");
 const cors = require("cors");
@@ -7,6 +6,11 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// 🔹 permitir cargar archivos HTML
+app.use(express.static(__dirname));
+app.use(express.static(__dirname + "/Validación de cuenta"));
+app.use(express.static(__dirname + "/Validación de cuenta/Enlaces"));
 
 const config = {
     user: "sa",
@@ -18,7 +22,6 @@ const config = {
         trustServerCertificate: true
     }
 };
-
 
 const configSaldos = {
     user: "sa",
@@ -49,7 +52,14 @@ async function conectarDB() {
     }
 }
 
-conectarDB();app.get("/loginUsuario", async (req, res) => {
+conectarDB();
+
+// 🔹 página principal del cajero
+app.get("/", (req, res) => {
+    res.sendFile(__dirname + "/Validación de cuenta/CajeroAuto.html");
+});
+
+app.get("/loginUsuario", async (req, res) => {
     const nombre = req.query.nombre;
 
     try {
@@ -73,7 +83,6 @@ conectarDB();app.get("/loginUsuario", async (req, res) => {
         res.status(500).json({ ok: false });
     }
 });
-
 
 app.get("/login", async (req, res) => {
 
@@ -111,7 +120,7 @@ app.get("/login", async (req, res) => {
 
 });
 
-//Saldos
+// Saldos
 app.get("/saldo", async (req, res) => {
 
     const nombre = req.query.nombre;
@@ -148,7 +157,7 @@ app.get("/saldo", async (req, res) => {
 
 });
 
-//Retiro
+// Retiro
 app.get("/retirar", async (req, res) => {
 
     const nombre = req.query.nombre;
@@ -165,17 +174,13 @@ app.get("/retirar", async (req, res) => {
             `);
 
         if (result.recordset.length === 0) {
-
             return res.json({ ok: false });
-
         }
 
         let saldoActual = result.recordset[0].saldo;
 
         if (valor > saldoActual) {
-
             return res.json({ ok: false, mensaje: "Fondos insuficientes" });
-
         }
 
         let nuevoSaldo = saldoActual - valor;
@@ -202,6 +207,7 @@ app.get("/retirar", async (req, res) => {
     }
 
 });
+
 app.listen(3000, () => {
     console.log("Servidor corriendo en puerto 3000");
-}); 
+});
