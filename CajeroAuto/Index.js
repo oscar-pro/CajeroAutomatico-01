@@ -6,6 +6,8 @@ let Salir = document.getElementById("BtnSalir");
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 const pagina = window.location.pathname;
+const X = document.getElementById('btnBorrar');
+const O = document.getElementById('btnSeguir');
 
 /*---------------------------------------------------------------
     pagina principal Cajero Automatico
@@ -56,13 +58,62 @@ if (pagina.includes("CajeroAuto.html")) {
 
 };
 
+/*--------------------------------------------------------
+    APARTADO DE ENLACES 
+--------------------------------------------------------*/
+
 /*---------------------------------------------------------------
     Pagina de saldo
     ----------------------------------------------------------------*/
 
 if (pagina.includes("Saldo.html")) {
 
-    /*---------------------------------------------------------------     ----------------------------------------------------------------*/
+    // capturamos saldo
+    let VerSaldo = document.getElementById('Saldo');
+    //capturamos cuenta
+    let No$Cuenta = document.getElementById('NoCuenta');
+    // valor inicial
+    VerSaldo.innerHTML = `0.00`;
+
+    // obtenemos usuario
+    const usuario = localStorage.getItem('usuario');
+
+    // llamamos función
+    VerSaldoANDCuenta(usuario);
+
+    async function VerSaldoANDCuenta(usuario) {
+
+        try {
+
+            const resp = await fetch(
+                `http://localhost:3000/saldo?nombre=${usuario}`
+            );
+
+            let data = await resp.json();
+
+            console.log(data);
+
+            if (data.ok) {
+
+                // mostramos saldo
+                VerSaldo.innerHTML = `${data.data.saldo}`;
+                //Mostramos No. Cuenta 
+                No$Cuenta.innerHTML = `${data.data.numeroCuenta}`;
+
+            } else {
+
+                alert("No se encontró el usuario");
+
+            }
+
+        } catch (error) {
+
+            console.log("Error:", error);
+            alert("Error de conexion con el servidor");
+
+        }
+
+    }
     console.log(`La pagina actual es ${pagina}`);
 
     Salir.addEventListener('click', () => {
@@ -92,22 +143,87 @@ if (pagina.includes("Deposito.html")) {
     Pagina De Retiro
     ----------------------------------------------------------------*/
 if (pagina.includes("Retiro.html")) {
-    console.log(`La pagina actual es ${pagina}`);
 
-    Salir.addEventListener('click', () => {
-        let confirm = window.confirm('Seguro Que Deseas Salir?');
-        if (confirm) {
-            window.location = "../../CajeroAuto.html";
-        };
+    console.log(`La pagina actual es ${pagina}`);
+    // llamamos usuario de localstorage
+    let usuario = localStorage.getItem("usuario")
+    // capturamos el valor ingresado por el usuario
+    let Valor = document.getElementById('NumeroRetiro');
+    /*Guardamos los botones de la funcion en un array para luego utilizarlos */
+    let b1 = document.getElementById('btn1');
+    let b2 = document.getElementById('btn2');
+    let b3 = document.getElementById('btn3');
+    let b4 = document.getElementById('btn4');
+    let b5 = document.getElementById('btn5');
+    let b6 = document.getElementById('btn6');
+    let b7 = document.getElementById('btn7');
+    let b8 = document.getElementById('btn8');
+    let b9 = document.getElementById('btn9');
+    let b0 = document.getElementById('btn0');
+
+    let Botones = [b1, b2, b3, b4, b5, b6, b7, b8, b9, b0];
+
+    Botones.forEach(botones => {
+        botones.addEventListener('click', () => {
+            Valor.value += botones.textContent;
+        });
+
     });
+
+    //eliminamos todo con X 
+    X.addEventListener('click', () => {
+        let v = document.getElementById('NumeroRetiro');
+        v.value = '';
+    })
+
+    O.addEventListener('click', () => Retirar(usuario));
+
+    async function Retirar(usuario) {
+
+        try {
+
+            let valor = parseInt(Valor.value);
+
+            const resp = await fetch(
+                `http://localhost:3000/retirar?nombre=${usuario}&valor=${valor}`
+            );
+
+            let data = await resp.json();
+
+            if (data.ok) {
+
+                alert(`Retiraste ${valor} exitosamente
+Saldo disponible: ${data.nuevoSaldo}`);
+
+                Valor.value = '';
+
+            } else {
+
+                alert("Fondos insuficientes o usuario no existe");
+
+            }
+
+        } catch (error) {
+
+            console.log("Error:", error);
+            alert("Error de conexion con el servidor");
+
+        }
+
+}
+
+Salir.addEventListener('click', () => {
+    let confirm = window.confirm('Seguro Que Deseas Salir?');
+    if (confirm) {
+        window.location = "../../CajeroAuto.html";
+    };
+});
 }
 
 /*---------------------------------------------------------------
     Pagina de validación
     ----------------------------------------------------------------*/
 
-const X = document.getElementById('btnBorrar');
-const O = document.getElementById('btnSeguir');
 
 
 if (pagina.includes("Validacion.html")) {
