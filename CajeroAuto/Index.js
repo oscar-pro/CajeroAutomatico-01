@@ -9,6 +9,9 @@ Capturamos la ruta en PAGINA para saber en cual pagina estamos actualmente y pod
 ----------------------------------------------------------------------------------------------------------*/
 const pagina = window.location.pathname;
 
+//guardamos la ruta la cual quiere ingresar el usuario
+let ruta = '';
+
 /*---------------------------------------------------------------
     pagina principal Cajero Automatico
     ----------------------------------------------------------------*/
@@ -19,6 +22,7 @@ if (pagina.includes("CajeroAuto.html")) {
      Mostrar en consola la ruta en la pagina actual
      ----------------------------------------------------------------*/
     console.log(`La pagina actual es ${pagina}`);
+
 
     /*------------------------------------------------------------------
      Este script es escencial para todos los que tenga boton de salir 
@@ -33,20 +37,21 @@ if (pagina.includes("CajeroAuto.html")) {
     // Primero va la validación de la cuenta para ingresar el user y despues ir a los enlaces
 
     ConsultarSaldo.addEventListener('click', () => {
-
-
+        ruta = localStorage.setItem('../CajeroAuto/Validación de cuenta/Validacion.html');
         window.location = "../CajeroAuto/Validación de cuenta/Validacion.html";
 
         // window.location = "../CajeroAuto/Validación de cuenta/Enlaces/Saldo.html";
     });
 
     RetirarDinero.addEventListener('click', () => {
+        ruta = localStorage.setItem('../CajeroAuto/Validación de cuenta/Validacion.html');
         window.location = "../CajeroAuto/Validación de cuenta/Validacion.html";
         // window.location = "../CajeroAuto/Validación de cuenta/Enlaces/Retiro.html";
 
     });
 
     DepositarDinero.addEventListener('click', () => {
+        ruta = localStorage.setItem('../CajeroAuto/Validación de cuenta/Validacion.html');
         window.location = "../CajeroAuto/Validación de cuenta/Validacion.html";
         // window.location = "../CajeroAuto/Validación de cuenta/Enlaces/Deposito.html";
     })
@@ -144,45 +149,60 @@ if (pagina.includes("Validacion.html")) {
 
     /* Function para validar los datos y enviarlos */
     O.addEventListener('click', () => {
+
         if (!User.value) {
-            alert('⚠Las casillas no pueden estar vacias');
-        } else {
-            let dataUser = User.value.toUpperCase();
-            JsonData(dataUser);
+
+            alert('⚠ Las casillas no pueden estar vacias');
+            return;
+
         }
-    })
+
+        let dataUser = User.value.toUpperCase().trim();
+
+        ValidarUsuario(dataUser);
+
+    });
 };
 
 /*-----------------------------------------------------------------
 función para la peticion con fetch a json y validar los datos
 -----------------------------------------------------------------*/
+async function ValidarUsuario(nombre) {
 
-async function JsonData(value) {
-    let esp = await fetch('../database.json');
-    if (esp.ok) {
-        let resp = await esp.json();
-        // pasamos nombre a mayuscula para que no halla error en comparar 
-        let NameJson = resp.User.name.toUpperCase();
-        /*--------------------------------
-                Eliminamos espacios 
-        ---------------------------------*/
-        NameJson = NameJson.trim();
-        value = value.trim();
+    try {
 
-        // comparamos si existe dentro de json 
-        if (value != NameJson) {
-            alert('LOS DATOS NO COINCIDEN \n INTENTELO NUEVAMENTE');
-            // limpiamos las casilas luego de que pase 1.5 segundos 
-            setTimeout(() => {
-                User.value = '';
-            }, 1500);
+        const resp = await fetch(
+            `http://localhost:3000/loginUsuario?nombre=${nombre}`,
+            {
+                method: "GET"
+            }
+        );
+
+        let data = await resp.json();
+
+        console.log(data);
+
+        if (data.ok) {
+
+            console.log("Usuario valido");
+            localStorage.setItem("usuario", nombre);
+            window.location.href =
+                "../Validación de cuenta/PasswordVerifiqued.html";
+
         } else {
-            // en caso que todo esté bien, nos vamos a validar la con password
-            window.location = 'PasswordVerifiqued.html';
-        }
-    }
-}
 
+            alert("Usuario no existe");
+
+        }
+
+    } catch (error) {
+
+        console.log("Error:", error);
+        alert("Error de conexion con el servidor");
+
+    }
+
+}
 /* --------------------------------------------
     pagina para la validation de la contraseña 
 --------------------------------------------- */
@@ -244,17 +264,40 @@ if (pagina.includes("PasswordVerifiqued.html")) {
     //ahora le añadimos interactividad al O
 
     O.addEventListener('click', () => {
-        //comparamos con fetch
         let value = password.value;
         CompararContrasenia(value);
     });
-    async function CompararContrasenia(value) {
-        const esp = await fetch(`http://localhost:3000/login?pin=${value}`, {
-            method: "GET"
-        }); 
-        if (esp.ok) {
-            let respuesta = esp;
-            console.log(esp);
+
+    async function CompararContrasenia(pin) {
+
+        let nombre = localStorage.getItem("usuario");
+        let rua = localStorage.getItem(ruta);
+
+        try {
+
+            const resp = await fetch(
+                `http://localhost:3000/login?nombre=${nombre}&pin=${pin}`
+            );
+
+            const data = await resp.json();
+
+            console.log(data);
+
+            if (data.ok) {
+
+                console.log("PIN correcto");
+                window.location.href = rua;
+
+            } else {
+
+                alert("PIN incorrecto");
+
+            }
+
+        } catch (error) {
+
+            console.log("Error:", error);
+
         }
 
     }
